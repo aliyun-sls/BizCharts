@@ -8,6 +8,7 @@ export default {
 		file: './dist/bundle.js',
 		format: 'es',
 		interop: 'esModule',
+		strict: false,
 	},
 	external:['react', 'prop-types'],
 	plugins:[
