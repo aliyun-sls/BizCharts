@@ -1,2 +1,2 @@
-export Util from './util';
-export Prop from './prop';
+export * as Util from './util';
+export * as Prop from './prop';
