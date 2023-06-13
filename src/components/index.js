@@ -6,6 +6,7 @@ import Tooltip from './Tooltip';
 import Geom from './Geom';
 import View from './View';
 import Guide from './Guide';
+import Label from './Label'
 import Facet from './Facet';
 export {
   Chart,
@@ -16,5 +17,6 @@ export {
   Geom,
   View,
   Guide,
+  Label,
   Facet
 }

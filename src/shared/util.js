@@ -2,7 +2,7 @@
  * util function
  */
 
-import { Util } from '@antv/g2/lib/core';
+import { Util } from '@antv/g2/src/core';
 
 /* eslint-disable no-self-compare */
 

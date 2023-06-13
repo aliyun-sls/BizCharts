@@ -1,5 +1,6 @@
-import * as G2 from '@antv/g2/lib/core';
-import { Prop, Util } from '../shared';
+import * as G2 from '@antv/g2/src/core';
+import Util from '../shared/util';
+import Prop from '../shared/prop';
 import common from './common';
 import EventUtil from './event';
 import configMerge from './configMerge';

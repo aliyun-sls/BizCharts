@@ -1,9 +1,11 @@
 import * as G2 from '@antv/g2/src/core';
-import G2__default, { Util as Util$1, Shape, Animate, PathUtil } from '@antv/g2/src/core';
+import G2__default, { Util as Util$1 } from '@antv/g2/src/core';
+export { Animate, default as G2, PathUtil, Shape } from '@antv/g2/src/core';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import warning from 'warning';
 import '@antv/g2/src/geom/index';
+import invariant from 'invariant';
 import '@antv/g2/src/facet/index';
 
 function is(x, y) {
@@ -423,6 +425,34 @@ const iMerge = {
   }
 };
 
+var Prop = {
+  init(keys = {}, props, callback) {
+    Util.each(keys, (key) => {
+      let value = props[key];
+      if (value !== void 0) {
+        if (!Util.isArray(value)) {
+          value = [value];
+        }
+        callback(value, key);
+      }
+    });
+  },
+  update(keys, props, nextProps, callback) {
+    let value;
+    let nextValue;
+    Util.each(keys, (key) => {
+      value = props[key];
+      nextValue = nextProps[key];
+      if (!Util.shallowEqual(nextValue, value)) {
+        if (!Util.isArray(nextValue)) {
+          nextValue = [nextValue];
+        }
+        callback(nextValue, key);
+      }
+    });
+  }
+};
+
 var common = {
   COORD_FUNC_PROPS: ["rotate", "scale", "reflect", "transpose"],
   GEOM_FUNC_PROPS: [
@@ -660,19 +690,19 @@ var EventUtil = {
   chartEvents
 };
 
-var __defProp$8 = Object.defineProperty;
+var __defProp$9 = Object.defineProperty;
 var __getOwnPropSymbols$4 = Object.getOwnPropertySymbols;
 var __hasOwnProp$4 = Object.prototype.hasOwnProperty;
 var __propIsEnum$4 = Object.prototype.propertyIsEnumerable;
-var __defNormalProp$8 = (obj, key, value) => key in obj ? __defProp$8(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __defNormalProp$9 = (obj, key, value) => key in obj ? __defProp$9(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __spreadValues$4 = (a, b) => {
   for (var prop in b || (b = {}))
     if (__hasOwnProp$4.call(b, prop))
-      __defNormalProp$8(a, prop, b[prop]);
+      __defNormalProp$9(a, prop, b[prop]);
   if (__getOwnPropSymbols$4)
     for (var prop of __getOwnPropSymbols$4(b)) {
       if (__propIsEnum$4.call(b, prop))
-        __defNormalProp$8(a, prop, b[prop]);
+        __defNormalProp$9(a, prop, b[prop]);
     }
   return a;
 };
@@ -723,9 +753,9 @@ var g2Creator = {
     const _a = coordConfig.props, { type } = _a, others = __objRest$2(_a, ["type"]);
     const coordIns = chart.coord(
       type || "rect",
-      undefined(others, COORD_FUNC_PROPS$1)
+      Util.without(others, COORD_FUNC_PROPS$1)
     );
-    undefined(COORD_FUNC_PROPS$1, others, (value, key) => {
+    Prop.init(COORD_FUNC_PROPS$1, others, (value, key) => {
       coordIns[key](...value);
     });
     coordConfig.g2Instance = coordIns;
@@ -736,7 +766,9 @@ var g2Creator = {
     }
     const _a = labelConfig.props, { content } = _a, labelOthers = __objRest$2(_a, ["content"]);
     if (content) {
-      if (undefined(content)) ; else {
+      if (Util.isArray(content)) {
+        labelConfig.g2Instance = geom.label(content[0], content[1], labelOthers);
+      } else {
         labelConfig.g2Instance = geom.label(content, labelOthers);
       }
     }
@@ -753,7 +785,7 @@ var g2Creator = {
     if (props.adjust) {
       geom.adjust(props.adjust);
     }
-    undefined(GEOM_FUNC_PROPS$1, props, (value, key) => {
+    Prop.init(GEOM_FUNC_PROPS$1, props, (value, key) => {
       geom[key](...value);
     });
     geomConfig.g2Instance = geom;
@@ -984,19 +1016,19 @@ var g2Creator = {
   }
 };
 
-var __defProp$7 = Object.defineProperty;
+var __defProp$8 = Object.defineProperty;
 var __getOwnPropSymbols$3 = Object.getOwnPropertySymbols;
 var __hasOwnProp$3 = Object.prototype.hasOwnProperty;
 var __propIsEnum$3 = Object.prototype.propertyIsEnumerable;
-var __defNormalProp$7 = (obj, key, value) => key in obj ? __defProp$7(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __defNormalProp$8 = (obj, key, value) => key in obj ? __defProp$8(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __spreadValues$3 = (a, b) => {
   for (var prop in b || (b = {}))
     if (__hasOwnProp$3.call(b, prop))
-      __defNormalProp$7(a, prop, b[prop]);
+      __defNormalProp$8(a, prop, b[prop]);
   if (__getOwnPropSymbols$3)
     for (var prop of __getOwnPropSymbols$3(b)) {
       if (__propIsEnum$3.call(b, prop))
-        __defNormalProp$7(a, prop, b[prop]);
+        __defNormalProp$8(a, prop, b[prop]);
     }
   return a;
 };
@@ -1020,8 +1052,9 @@ const iUpdate = {
       return false;
     const chartProps = config.chart.props;
     const nextChartProps = config.chart.updateProps;
-    if (!undefined(chartProps.padding, nextChartProps.padding)   )
+    if (!Util.shallowEqual(chartProps.padding, nextChartProps.padding) || !Util.shallowEqual(chartProps.background, nextChartProps.background) || !Util.shallowEqual(chartProps.plotBackground, nextChartProps.plotBackground) || !Util.shallowEqual(chartProps.pixelRatio, nextChartProps.pixelRatio))
       return true;
+    return false;
   },
   needReExecute(config) {
     const geoms = config.geoms;
@@ -1060,8 +1093,10 @@ const iUpdate = {
     if (data !== nextData) {
       chart.changeData(nextData);
     }
-    if (!undefined(scale, nextScale)) {
-      if (undefined(nextScale)) ; else {
+    if (!Util.shallowEqual(scale, nextScale)) {
+      if (Util.isArray(nextScale)) {
+        chart.scale(nextScale[0], nextScale[1]);
+      } else {
         chart.scale(nextScale);
       }
     }
@@ -1085,7 +1120,7 @@ const iUpdate = {
     if (visible !== nextVisible) {
       chart.axis(name, !!nextVisible);
     }
-    if (!undefined(others, nextOthers)) {
+    if (!Util.shallowEqual(others, nextOthers)) {
       chart.axis(name, nextOthers);
     }
   },
@@ -1107,7 +1142,7 @@ const iUpdate = {
     if (props == null && nextProps == null) {
       return;
     }
-    if (!undefined(props, nextProps)) {
+    if (!Util.shallowEqual(props, nextProps)) {
       chart.tooltip(__spreadValues$3({}, nextProps));
     }
   },
@@ -1120,11 +1155,11 @@ const iUpdate = {
     if (props == null || nextProps == null) {
       return;
     }
-    const nextAttrs = undefined(nextProps, COORD_FUNC_PROPS.concat(["type"]));
-    if (!undefined(props, nextProps)) {
+    const nextAttrs = Util.without(nextProps, COORD_FUNC_PROPS.concat(["type"]));
+    if (!Util.shallowEqual(props, nextProps)) {
       const g2Instance = chart.coord(nextProps.type, nextAttrs);
       coordConfig.g2Instance = g2Instance;
-      undefined(COORD_FUNC_PROPS, nextProps, (value, key) => {
+      Prop.init(COORD_FUNC_PROPS, nextProps, (value, key) => {
         g2Instance[key](...value);
       });
     }
@@ -1134,7 +1169,9 @@ const iUpdate = {
     const nextProps = legendConfig.updateProps;
     if (!nextProps)
       return;
-    if (undefined(props, nextProps)) ;
+    if (Util.shallowEqual(props, nextProps)) {
+      return;
+    }
     const _a = nextProps, { name, visible } = _a, cfg = __objRest$1(_a, ["name", "visible"]);
     const arg = !visible ? visible : cfg;
     chart.legend(...name ? [name, arg] : [arg]);
@@ -1153,10 +1190,12 @@ const iUpdate = {
     if (props == null || nextProps == null) {
       return;
     }
-    const _a = props, others = __objRest$1(_a, ["content"]);
+    const _a = props, { content } = _a, others = __objRest$1(_a, ["content"]);
     const _b = nextProps, { content: nextContent } = _b, nextOthers = __objRest$1(_b, ["content"]);
-    if (!undefined(others, nextOthers) ) {
-      if (undefined(nextContent)) ; else {
+    if (!Util.shallowEqual(others, nextOthers) || !Util.shallowEqual(content, nextContent)) {
+      if (Util.isArray(nextContent)) {
+        geom.label(nextContent[0], nextContent[1], nextOthers);
+      } else {
         geom.label(nextContent, nextOthers);
       }
     }
@@ -1170,13 +1209,18 @@ const iUpdate = {
       return;
     }
     const geom = geomConfig.g2Instance;
-    if (undefined(props, nextProps)) ;
+    if (Util.shallowEqual(props, nextProps)) {
+      if (geomConfig.label) {
+        this.updateLabel(geom, geomConfig.label.props, geomConfig.label.updateProps);
+      }
+      return;
+    }
     const _a = props, { adjust } = _a, attrs = __objRest$1(_a, ["adjust"]);
     const _b = nextProps, { adjust: nextAdjust } = _b, nextAttrs = __objRest$1(_b, ["adjust"]);
     if (adjust || nextAdjust) {
       geom.adjust(nextAdjust);
     }
-    undefined(GEOM_FUNC_PROPS, attrs, nextAttrs, (value, key) => {
+    Prop.update(GEOM_FUNC_PROPS, attrs, nextAttrs, (value, key) => {
       geom[key](...value);
     });
     if (geomConfig.label) {
@@ -1195,9 +1239,10 @@ const iUpdate = {
     return false;
   },
   isTypedGuideChanged(config) {
-    if (!undefined(config.props, config.updateProps)) {
+    if (!Util.shallowEqual(config.props, config.updateProps)) {
       return true;
     }
+    return false;
   },
   updateGuide(chart, guide) {
     if (!guide || !guide.elements) {
@@ -1240,10 +1285,10 @@ const iUpdate = {
     if (data !== nextData) {
       view.changeData(nextData);
     }
-    if (!undefined(scale, nextScale)) {
+    if (!Util.shallowEqual(scale, nextScale)) {
       view.scale(nextScale);
     }
-    if (!undefined(filter, nextFilter)) {
+    if (!Util.shallowEqual(filter, nextFilter)) {
       nextFilter.forEach((filterArg) => {
         view.filter(filterArg[0], filterArg[1]);
       });
@@ -1280,7 +1325,7 @@ const iUpdate = {
       return;
     const _a = props, { type } = _a, others = __objRest$1(_a, ["type"]);
     const _b = nextProps, { type: nextType } = _b, nextOthers = __objRest$1(_b, ["type"]);
-    if (type !== nextType || !undefined(others, nextOthers)) {
+    if (type !== nextType || !Util.shallowEqual(others, nextOthers)) {
       facetConfig.props = nextProps;
       g2Creator.facet(chart, config);
     }
@@ -1372,19 +1417,19 @@ const iDelete = {
   }
 };
 
-var __defProp$6 = Object.defineProperty;
+var __defProp$7 = Object.defineProperty;
 var __getOwnPropSymbols$2 = Object.getOwnPropertySymbols;
 var __hasOwnProp$2 = Object.prototype.hasOwnProperty;
 var __propIsEnum$2 = Object.prototype.propertyIsEnumerable;
-var __defNormalProp$6 = (obj, key, value) => key in obj ? __defProp$6(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __defNormalProp$7 = (obj, key, value) => key in obj ? __defProp$7(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __spreadValues$2 = (a, b) => {
   for (var prop in b || (b = {}))
     if (__hasOwnProp$2.call(b, prop))
-      __defNormalProp$6(a, prop, b[prop]);
+      __defNormalProp$7(a, prop, b[prop]);
   if (__getOwnPropSymbols$2)
     for (var prop of __getOwnPropSymbols$2(b)) {
       if (__propIsEnum$2.call(b, prop))
-        __defNormalProp$6(a, prop, b[prop]);
+        __defNormalProp$7(a, prop, b[prop]);
     }
   return a;
 };
@@ -1416,11 +1461,11 @@ class Processor {
     if (name === "Chart" || name === "View") {
       const _c = props, { data } = _c, otherProps = __objRest(_c, ["data"]);
       const _d = nextProps, { data: nextData } = _d, nextOtherProps = __objRest(_d, ["data"]);
-      if (data !== nextData || !undefined(otherProps, nextOtherProps)) {
+      if (data !== nextData || !Util.isEqual(otherProps, nextOtherProps)) {
         this.updated = true;
       }
     } else {
-      if (!undefined(props, nextProps)) {
+      if (!Util.isEqual(props, nextProps)) {
         this.updated = true;
       }
     }
@@ -1523,54 +1568,54 @@ class Processor {
   }
 }
 
-var __defProp$5 = Object.defineProperty;
+var __defProp$6 = Object.defineProperty;
 var __defProps = Object.defineProperties;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropSymbols$1 = Object.getOwnPropertySymbols;
 var __hasOwnProp$1 = Object.prototype.hasOwnProperty;
 var __propIsEnum$1 = Object.prototype.propertyIsEnumerable;
-var __defNormalProp$5 = (obj, key, value) => key in obj ? __defProp$5(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __defNormalProp$6 = (obj, key, value) => key in obj ? __defProp$6(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __spreadValues$1 = (a, b) => {
   for (var prop in b || (b = {}))
     if (__hasOwnProp$1.call(b, prop))
-      __defNormalProp$5(a, prop, b[prop]);
+      __defNormalProp$6(a, prop, b[prop]);
   if (__getOwnPropSymbols$1)
     for (var prop of __getOwnPropSymbols$1(b)) {
       if (__propIsEnum$1.call(b, prop))
-        __defNormalProp$5(a, prop, b[prop]);
+        __defNormalProp$6(a, prop, b[prop]);
     }
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var __publicField$5 = (obj, key, value) => {
-  __defNormalProp$5(obj, typeof key !== "symbol" ? key + "" : key, value);
+var __publicField$6 = (obj, key, value) => {
+  __defNormalProp$6(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
 class PureChart extends Component {
   constructor(props) {
     super(props);
-    __publicField$5(this, "getViewId", () => {
+    __publicField$6(this, "getViewId", () => {
     });
-    __publicField$5(this, "getParentInfo", () => {
+    __publicField$6(this, "getParentInfo", () => {
       return {
         id: this.id,
         name: this.name
       };
     });
-    __publicField$5(this, "createId", () => {
+    __publicField$6(this, "createId", () => {
       this.gId += 1;
       return this.gId;
     });
-    __publicField$5(this, "addElement", (name, id, props, parentInfo, viewId) => {
+    __publicField$6(this, "addElement", (name, id, props, parentInfo, viewId) => {
       return this.g2Processor.addElement(name, id, props, parentInfo, viewId);
     });
-    __publicField$5(this, "updateElement", (name, id, props, parentInfo, viewId) => {
+    __publicField$6(this, "updateElement", (name, id, props, parentInfo, viewId) => {
       this.g2Processor.updateElement(name, id, props, parentInfo, viewId);
     });
-    __publicField$5(this, "deleteElement", (name, id, parentInfo) => {
+    __publicField$6(this, "deleteElement", (name, id, parentInfo) => {
       this.g2Processor.deleteElement(name, id, parentInfo);
     });
-    __publicField$5(this, "refHandle", (cw) => {
+    __publicField$6(this, "refHandle", (cw) => {
       if (!this.containerWrap) {
         this.containerWrap = cw;
       }
@@ -1632,7 +1677,7 @@ class PureChart extends Component {
     return /* @__PURE__ */ React.createElement("div", { ref: this.refHandle }, this.props.children);
   }
 }
-__publicField$5(PureChart, "propTypes", {
+__publicField$6(PureChart, "propTypes", {
   data: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.object),
     PropTypes.object
@@ -1646,7 +1691,7 @@ __publicField$5(PureChart, "propTypes", {
   height: PropTypes.number.isRequired,
   onGetG2Instance: PropTypes.func
 });
-__publicField$5(PureChart, "childContextTypes", {
+__publicField$6(PureChart, "childContextTypes", {
   addElement: PropTypes.func,
   updateElement: PropTypes.func,
   deleteElement: PropTypes.func,
@@ -1655,10 +1700,10 @@ __publicField$5(PureChart, "childContextTypes", {
   getViewId: PropTypes.func
 });
 
-var __defProp$4 = Object.defineProperty;
-var __defNormalProp$4 = (obj, key, value) => key in obj ? __defProp$4(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField$4 = (obj, key, value) => {
-  __defNormalProp$4(obj, typeof key !== "symbol" ? key + "" : key, value);
+var __defProp$5 = Object.defineProperty;
+var __defNormalProp$5 = (obj, key, value) => key in obj ? __defProp$5(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$5 = (obj, key, value) => {
+  __defNormalProp$5(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
 warning(React.PureComponent, "`React.PureComponent` needs React >=15.3.0");
@@ -1668,7 +1713,7 @@ class Empty extends (React.PureComponent || React.Component) {
     return /* @__PURE__ */ React.createElement("div", { style: { width, height } }, placeholder);
   }
 }
-__publicField$4(Empty, "propTypes", {
+__publicField$5(Empty, "propTypes", {
   width: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number
@@ -1679,7 +1724,7 @@ __publicField$4(Empty, "propTypes", {
   ]),
   placeholder: PropTypes.node
 });
-__publicField$4(Empty, "defaultProps", {
+__publicField$5(Empty, "defaultProps", {
   width: "100%",
   placeholder: /* @__PURE__ */ React.createElement("div", { style: { position: "relative", top: "48%", textAlign: "center" } }, "\u6682\u65E0\u6570\u636E")
 });
@@ -1703,24 +1748,24 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-var __defProp$3 = Object.defineProperty;
+var __defProp$4 = Object.defineProperty;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp$3 = (obj, key, value) => key in obj ? __defProp$3(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __defNormalProp$4 = (obj, key, value) => key in obj ? __defProp$4(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __spreadValues = (a, b) => {
   for (var prop in b || (b = {}))
     if (__hasOwnProp.call(b, prop))
-      __defNormalProp$3(a, prop, b[prop]);
+      __defNormalProp$4(a, prop, b[prop]);
   if (__getOwnPropSymbols)
     for (var prop of __getOwnPropSymbols(b)) {
       if (__propIsEnum.call(b, prop))
-        __defNormalProp$3(a, prop, b[prop]);
+        __defNormalProp$4(a, prop, b[prop]);
     }
   return a;
 };
-var __publicField$3 = (obj, key, value) => {
-  __defNormalProp$3(obj, typeof key !== "symbol" ? key + "" : key, value);
+var __publicField$4 = (obj, key, value) => {
+  __defNormalProp$4(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
 function hasSource(source) {
@@ -1733,12 +1778,12 @@ function hasSource(source) {
 class Chart extends (React.PureComponent || React.Component) {
   constructor() {
     super(...arguments);
-    __publicField$3(this, "_refCallback", (c) => {
+    __publicField$4(this, "_refCallback", (c) => {
       if (c) {
         this.chart = c.getG2Instance();
       }
     });
-    __publicField$3(this, "hasViewSource", () => {
+    __publicField$4(this, "hasViewSource", () => {
       let hasViewSource = false;
       React.Children.map(this.props.children, (child) => {
         if (!hasViewSource && typeof child.type === "function" && child.type.name === "View" && child.props.data && hasSource(child.props.data)) {
@@ -1769,16 +1814,16 @@ class BChart extends React.Component {
   }
 }
 
-var __defProp$2 = Object.defineProperty;
-var __defNormalProp$2 = (obj, key, value) => key in obj ? __defProp$2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField$2 = (obj, key, value) => {
-  __defNormalProp$2(obj, typeof key !== "symbol" ? key + "" : key, value);
+var __defProp$3 = Object.defineProperty;
+var __defNormalProp$3 = (obj, key, value) => key in obj ? __defProp$3(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$3 = (obj, key, value) => {
+  __defNormalProp$3(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
 class BaseComponent extends Component {
   constructor(props, name) {
     super(props);
-    __publicField$2(this, "getParentInfo", () => {
+    __publicField$3(this, "getParentInfo", () => {
       return {
         id: this.id,
         name: this.name
@@ -1831,7 +1876,7 @@ class BaseComponent extends Component {
     return children;
   }
 }
-__publicField$2(BaseComponent, "contextTypes", {
+__publicField$3(BaseComponent, "contextTypes", {
   addElement: PropTypes.func,
   updateElement: PropTypes.func,
   deleteElement: PropTypes.func,
@@ -1839,7 +1884,7 @@ __publicField$2(BaseComponent, "contextTypes", {
   getParentInfo: PropTypes.func,
   getViewId: PropTypes.func
 });
-__publicField$2(BaseComponent, "childContextTypes", {
+__publicField$3(BaseComponent, "childContextTypes", {
   addElement: PropTypes.func,
   updateElement: PropTypes.func,
   deleteElement: PropTypes.func,
@@ -1863,7 +1908,7 @@ function generateBaseTypedComponent(name) {
       };
     }
   }
-  __publicField$2(TypedComponent, "contextTypes", {
+  __publicField$3(TypedComponent, "contextTypes", {
     addElement: PropTypes.func,
     updateElement: PropTypes.func,
     deleteElement: PropTypes.func,
@@ -1871,7 +1916,7 @@ function generateBaseTypedComponent(name) {
     getParentInfo: PropTypes.func,
     getViewId: PropTypes.func
   });
-  __publicField$2(TypedComponent, "childContextTypes", {
+  __publicField$3(TypedComponent, "childContextTypes", {
     addElement: PropTypes.func,
     updateElement: PropTypes.func,
     deleteElement: PropTypes.func,
@@ -1887,10 +1932,10 @@ var index$4 = BaseComponent.generateBaseTypedComponent("Coord");
 
 var index$3 = BaseComponent.generateBaseTypedComponent("Axis");
 
-var __defProp$1 = Object.defineProperty;
-var __defNormalProp$1 = (obj, key, value) => key in obj ? __defProp$1(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField$1 = (obj, key, value) => {
-  __defNormalProp$1(obj, typeof key !== "symbol" ? key + "" : key, value);
+var __defProp$2 = Object.defineProperty;
+var __defNormalProp$2 = (obj, key, value) => key in obj ? __defProp$2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$2 = (obj, key, value) => {
+  __defNormalProp$2(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
 class Legend extends BaseComponent {
@@ -1898,7 +1943,7 @@ class Legend extends BaseComponent {
     super(props, "Legend");
   }
 }
-__publicField$1(Legend, "contextTypes", {
+__publicField$2(Legend, "contextTypes", {
   addElement: PropTypes.func,
   updateElement: PropTypes.func,
   deleteElement: PropTypes.func,
@@ -1906,7 +1951,7 @@ __publicField$1(Legend, "contextTypes", {
   getParentInfo: PropTypes.func,
   getViewId: PropTypes.func
 });
-__publicField$1(Legend, "childContextTypes", {
+__publicField$2(Legend, "childContextTypes", {
   addElement: PropTypes.func,
   updateElement: PropTypes.func,
   deleteElement: PropTypes.func,
@@ -1914,7 +1959,7 @@ __publicField$1(Legend, "childContextTypes", {
   getParentInfo: PropTypes.func,
   getViewId: PropTypes.func
 });
-__publicField$1(Legend, "defaultProps", {
+__publicField$2(Legend, "defaultProps", {
   visible: true
 });
 
@@ -1922,16 +1967,16 @@ var index$2 = BaseComponent.generateBaseTypedComponent("Tooltip");
 
 var index$1 = BaseComponent.generateBaseTypedComponent("Geom");
 
-var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => {
-  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+var __defProp$1 = Object.defineProperty;
+var __defNormalProp$1 = (obj, key, value) => key in obj ? __defProp$1(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$1 = (obj, key, value) => {
+  __defNormalProp$1(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
 class View extends BaseComponent {
   constructor(props) {
     super(props, "View");
-    __publicField(this, "getViewId", () => {
+    __publicField$1(this, "getViewId", () => {
       return this.id;
     });
   }
@@ -1946,7 +1991,7 @@ class View extends BaseComponent {
     };
   }
 }
-__publicField(View, "contextTypes", {
+__publicField$1(View, "contextTypes", {
   addElement: PropTypes.func,
   updateElement: PropTypes.func,
   deleteElement: PropTypes.func,
@@ -1954,7 +1999,7 @@ __publicField(View, "contextTypes", {
   getParentInfo: PropTypes.func,
   getViewId: PropTypes.func
 });
-__publicField(View, "childContextTypes", {
+__publicField$1(View, "childContextTypes", {
   addElement: PropTypes.func,
   updateElement: PropTypes.func,
   deleteElement: PropTypes.func,
@@ -1974,38 +2019,59 @@ Guide.RegionFilter = BaseComponent.generateBaseTypedComponent("GuideRegionFilter
 Guide.DataMarker = BaseComponent.generateBaseTypedComponent("GuideDataMarker");
 Guide.DataRegion = BaseComponent.generateBaseTypedComponent("GuideDataRegion");
 
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+class Label extends BaseComponent {
+  constructor(props) {
+    super(props, "Label");
+  }
+  componentWillMount() {
+    const parentInfo = this.context.getParentInfo();
+    invariant(parentInfo.name === "Geom", "`<Label />` must be wrapped in `<Geom />`");
+    this.id = this.context.createId();
+    this.context.addElement(
+      this.name,
+      this.id,
+      this.props,
+      this.context.getParentInfo(),
+      this.context.getViewId()
+    );
+  }
+}
+__publicField(Label, "contextTypes", {
+  addElement: PropTypes.func,
+  updateElement: PropTypes.func,
+  deleteElement: PropTypes.func,
+  createId: PropTypes.func,
+  getParentInfo: PropTypes.func,
+  getViewId: PropTypes.func
+});
+__publicField(Label, "childContextTypes", {
+  addElement: PropTypes.func,
+  updateElement: PropTypes.func,
+  deleteElement: PropTypes.func,
+  createId: PropTypes.func,
+  getParentInfo: PropTypes.func,
+  getViewId: PropTypes.func
+});
+
 var index = BaseComponent.generateBaseTypedComponent("Facet");
 
-var components = /*#__PURE__*/Object.create({
-  __proto__: null,
-  Axis: index$3,
-  Chart: BChart,
-  Coord: index$4,
-  Facet: index,
-  Geom: index$1,
-  Guide: Guide,
-  Legend: Legend,
-  Tooltip: index$2,
-  View: View
-});
-
 G2__default.Global.trackingInfo = { bizcharts: "3.2.2-beta.4" };
-const BizCharts = Util.mix(components, {
-  G2: G2__default,
-  Util,
-  Shape,
-  Animate,
-  PathUtil,
-  track(enable = false) {
-    G2__default.track(enable);
-  },
-  setTheme(theme) {
-    let themeObj = theme;
-    if (typeof theme === "string" && Themes[theme]) {
-      themeObj = Themes[theme];
-    }
-    G2__default.Global.setTheme(themeObj);
+G2__default.Global.animate = false;
+function track(enable = false) {
+  G2__default.track(enable);
+}
+function setTheme(theme) {
+  let themeObj = theme;
+  if (typeof theme === "string" && Themes[theme]) {
+    themeObj = Themes[theme];
   }
-});
-exports.default = BizCharts;
-module.exports = BizCharts;
+  G2__default.Global.setTheme(themeObj);
+}
+
+export { index$3 as Axis, BChart as Chart, index$4 as Coord, index as Facet, index$1 as Geom, Guide, Label, Legend, index$2 as Tooltip, Util, View, setTheme, track };

@@ -1,4 +1,4 @@
-import G2, { Shape, PathUtil, Animate } from '@antv/g2/lib/core';
+import G2, { Shape, PathUtil, Animate } from '@antv/g2/src/core';
 import Util from './shared/util';
 import Themes from './themes';
 
