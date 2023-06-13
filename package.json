@@ -1,6 +1,6 @@
 {
   "name": "@aliyun-sls/bizcharts",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "A powerful React chart library based G2 for browser",
   "main": "dist/bundle.js",
   "browser": "dist/bundle.js",

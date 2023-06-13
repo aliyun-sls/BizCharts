@@ -1,10 +1,10 @@
-import * as G2 from '@antv/g2/lib/core';
-import G2__default, { Util as Util$1, Shape, Animate, PathUtil } from '@antv/g2/lib/core';
+import * as G2 from '@antv/g2/src/core';
+import G2__default, { Util as Util$1, Shape, Animate, PathUtil } from '@antv/g2/src/core';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import warning from 'warning';
-import '@antv/g2/lib/geom/index';
-import '@antv/g2/lib/facet/index';
+import '@antv/g2/src/geom/index';
+import '@antv/g2/src/facet/index';
 
 function is(x, y) {
   if (x === y) {
