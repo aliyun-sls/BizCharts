@@ -1,13 +1,12 @@
 {
   "name": "@aliyun-sls/bizcharts",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "A powerful React chart library based G2 for browser",
   "main": "dist/bundle.js",
   "browser": "dist/bundle.js",
   "module": "dist/bundle.js",
   "jsnext:main": "dist/bundle.js",
   "types": "typings/index.d.ts",
-  "type": "module",
   "files": [
     "*.md",
     "demo",
